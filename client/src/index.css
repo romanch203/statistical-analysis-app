@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+
+  /* Custom StatAnalyzer Pro colors */
+  --ibm-blue: hsl(207, 100%, 40%);
+  --ibm-blue-dark: hsl(207, 100%, 35%);
+  --text-primary: hsl(0, 0%, 8%);
+  --text-secondary: hsl(0, 0%, 32%);
+  --border-gray: hsl(0, 0%, 88%);
+  --success-green: hsl(122, 49%, 43%);
+  --error-red: hsl(358, 68%, 48%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+
+  /* Dark mode custom colors */
+  --ibm-blue: hsl(207, 90%, 54%);
+  --ibm-blue-dark: hsl(207, 100%, 45%);
+  --text-primary: hsl(0, 0%, 98%);
+  --text-secondary: hsl(0, 0%, 64%);
+  --border-gray: hsl(240, 3.7%, 15.9%);
+  --success-green: hsl(122, 39%, 49%);
+  --error-red: hsl(358, 68%, 58%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-gray-50 dark:bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+}
+
+@layer components {
+  .ibm-blue {
+    color: var(--ibm-blue);
+  }
+  
+  .ibm-blue-dark {
+    color: var(--ibm-blue-dark);
+  }
+  
+  .text-primary {
+    color: var(--text-primary);
+  }
+  
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+  
+  .border-gray {
+    border-color: var(--border-gray);
+  }
+  
+  .success-green {
+    color: var(--success-green);
+  }
+  
+  .error-red {
+    color: var(--error-red);
+  }
+
+  .bg-ibm-blue {
+    background-color: var(--ibm-blue);
+  }
+  
+  .bg-ibm-blue-dark {
+    background-color: var(--ibm-blue-dark);
+  }
+  
+  .bg-success-green {
+    background-color: var(--success-green);
+  }
+  
+  .bg-error-red {
+    background-color: var(--error-red);
+  }
+
+  .hover\:bg-ibm-blue-dark:hover {
+    background-color: var(--ibm-blue-dark);
+  }
+
+  .hover\:text-ibm-blue:hover {
+    color: var(--ibm-blue);
+  }
+
+  .border-ibm-blue {
+    border-color: var(--ibm-blue);
+  }
+
+  .upload-area {
+    @apply border-2 border-dashed border-blue-500 bg-blue-50 dark:bg-blue-950/50 rounded-lg p-12 text-center hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer;
+  }
+
+  .upload-area.drag-over {
+    @apply bg-blue-200 dark:bg-blue-800/50 border-blue-600;
+  }
+
+  .status-pending {
+    @apply bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400;
+  }
+
+  .status-processing {
+    @apply bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400;
+  }
+
+  .status-completed {
+    @apply bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400;
+  }
+
+  .status-failed {
+    @apply bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400;
+  }
+}
