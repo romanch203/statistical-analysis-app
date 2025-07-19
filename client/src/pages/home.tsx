@@ -63,10 +63,10 @@ export default function Home() {
         {/* Hero Section */}
         <Card className="p-8 mb-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-primary mb-4">Advanced Statistical Analysis Platform</h2>
-            <p className="text-lg text-secondary max-w-3xl mx-auto">
-              Upload your data in any format and receive comprehensive statistical analysis with SPSS/R-quality output, 
-              complete with AI-powered interpretations and professional reports.
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">Advanced Statistical Analysis Platform</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              Upload your data files and get comprehensive statistical analysis with professional SPSS/R-equivalent output, 
+              complete with AI-powered insights and publication-ready reports.
             </p>
           </div>
           

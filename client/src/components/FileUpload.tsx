@@ -32,6 +32,8 @@ export default function FileUpload({ researchQuestion, onFileUploaded }: FileUpl
   };
 
   const uploadFile = async (file: File) => {
+    console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
+    
     if (file.size > 500 * 1024 * 1024) {
       toast({
         variant: "destructive",
@@ -46,10 +48,19 @@ export default function FileUpload({ researchQuestion, onFileUploaded }: FileUpl
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('researchQuestion', researchQuestion);
+      formData.append('researchQuestion', researchQuestion || '');
 
+      console.log('Sending FormData with file:', file.name);
       const response = await apiRequest('POST', '/api/analyze', formData);
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Upload failed: ${response.status} ${errorText}`);
+      }
+      
       const result = await response.json();
+      console.log('Upload result:', result);
 
       toast({
         title: "File uploaded successfully",
@@ -57,7 +68,8 @@ export default function FileUpload({ researchQuestion, onFileUploaded }: FileUpl
       });
 
       onFileUploaded(result.analysisId);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Upload error:', error);
       toast({
         variant: "destructive",
         title: "Upload failed",
@@ -105,10 +117,10 @@ export default function FileUpload({ researchQuestion, onFileUploaded }: FileUpl
         disabled={uploading}
       />
       
-      <Upload className="text-5xl text-ibm-blue mb-4 mx-auto" />
-      <h3 className="text-xl font-semibold text-primary mb-2">Upload Your Data File</h3>
-      <p className="text-secondary mb-4">
-        Supports CSV, Excel (.xls, .xlsx), PDF, Word (.doc, .docx), Images, and more
+      <Upload className="w-16 h-16 text-blue-500 mb-6 mx-auto" />
+      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Upload Your Data File</h3>
+      <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 max-w-lg mx-auto">
+        Drag and drop or click to select files. We support CSV, Excel, PDF, Word documents, and images for statistical analysis.
       </p>
       
       <div className="flex justify-center flex-wrap gap-2 mb-4">
@@ -120,14 +132,15 @@ export default function FileUpload({ researchQuestion, onFileUploaded }: FileUpl
       </div>
       
       <Button 
-        className="bg-ibm-blue hover:bg-ibm-blue-dark"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium"
         disabled={uploading}
+        size="lg"
       >
-        <FolderOpen className="w-4 h-4 mr-2" />
+        <FolderOpen className="w-5 h-5 mr-2" />
         {uploading ? "Uploading..." : "Choose File or Drag & Drop"}
       </Button>
       
-      <p className="text-sm text-secondary mt-2">Maximum file size: 500MB</p>
+      <p className="text-base text-gray-500 dark:text-gray-400 mt-4 font-medium">Maximum file size: 500MB</p>
     </div>
   );
 }
