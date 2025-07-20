@@ -379,6 +379,55 @@ export class ReportGenerator {
       content += `  Missing: ${stats.missing}\n`;
     });
 
+    // Quality Control Charts section
+    if (results.qualityControlCharts && results.qualityControlCharts.length > 0) {
+      content += '\n\nQUALITY CONTROL CHARTS\n';
+      content += '======================\n';
+      
+      results.qualityControlCharts.forEach((chart, index) => {
+        const variable = results.variables[index];
+        content += `\n${chart.type.toUpperCase()}-Chart for ${variable?.name || 'Variable ' + (index + 1)}:\n`;
+        content += `  Center Line (X̄): ${chart.centerLine.toFixed(4)}\n`;
+        content += `  Upper Control Limit (UCL): ${chart.upperControlLimit.toFixed(4)}\n`;
+        content += `  Lower Control Limit (LCL): ${chart.lowerControlLimit.toFixed(4)}\n`;
+        content += `  Sample Size: ${chart.dataPoints.length} observations\n`;
+        content += `  Out of Control Points: ${chart.outOfControlPoints.length}\n`;
+        
+        const processCapability = this.calculateProcessCapability(chart);
+        content += `  Process Capability (Cp): ${processCapability.cp.toFixed(3)}\n`;
+        content += `  Process Capability (Cpk): ${processCapability.cpk.toFixed(3)}\n`;
+        
+        if (chart.outOfControlPoints.length > 0) {
+          content += `  PROCESS STATUS: OUT OF CONTROL\n`;
+          content += `  Special Causes Detected at Points: ${chart.outOfControlPoints.join(', ')}\n`;
+          content += `  Recommended Actions:\n`;
+          content += `    • Investigate root causes for out-of-control points\n`;
+          content += `    • Implement corrective actions\n`;
+          content += `    • Monitor process more closely\n`;
+        } else {
+          content += `  PROCESS STATUS: IN STATISTICAL CONTROL\n`;
+          content += `  Process is stable and predictable\n`;
+        }
+        
+        // Add ASCII chart
+        content += '\n  Control Chart Visualization:\n';
+        const chartVisualization = this.generateASCIIControlChart(chart);
+        chartVisualization.split('\n').forEach(line => {
+          content += `  ${line}\n`;
+        });
+        content += '\n';
+      });
+      
+      // Overall assessment
+      const overallAssessment = this.generateOverallProcessAssessment(results.qualityControlCharts);
+      content += '\nOVERALL PROCESS ASSESSMENT:\n';
+      content += `${overallAssessment.summary}\n\n`;
+      content += 'RECOMMENDATIONS:\n';
+      overallAssessment.recommendations.forEach((rec, index) => {
+        content += `${index + 1}. ${rec}\n`;
+      });
+    }
+
     content += '\n\nPowered by IBM SPSS and R Studio with Automation Workflow\n';
     content += '© 2024 ROMAN CHAUDHARY. All rights reserved.\n';
     content += 'Contact Developer: chaudharyroman.com.np\n';
@@ -449,37 +498,135 @@ export class ReportGenerator {
 
   private addQualityControlSection(doc: PDFKit.PDFDocument, results: StatisticalResults) {
     doc.fontSize(16).text('Quality Control Charts', 50, 50);
+    doc.fontSize(11).text('Statistical Process Control Analysis', 50, 75);
 
-    let y = 80;
+    let y = 100;
 
     results.qualityControlCharts!.forEach((chart, index) => {
-      if (y > 650) {
+      if (y > 500) {
         doc.addPage();
         y = 50;
       }
 
-      doc.fontSize(12).text(`${chart.type.toUpperCase()} Control Chart ${index + 1}`, 50, y);
-      y += 20;
-
-      doc.fontSize(10);
-      doc.text(`Center Line (CL): ${chart.centerLine.toFixed(3)}`, 70, y);
-      y += 15;
-      doc.text(`Upper Control Limit (UCL): ${chart.upperControlLimit.toFixed(3)}`, 70, y);
-      y += 15;
-      doc.text(`Lower Control Limit (LCL): ${chart.lowerControlLimit.toFixed(3)}`, 70, y);
-      y += 15;
-      doc.text(`Out of Control Points: ${chart.outOfControlPoints.length}`, 70, y);
+      const variable = results.variables[index];
+      doc.fontSize(14).text(`${chart.type.toUpperCase()}-Chart for ${variable?.name || 'Variable ' + (index + 1)}`, 50, y);
       y += 25;
 
+      // Chart parameters
+      doc.fontSize(12).text('Control Chart Parameters:', 50, y);
+      y += 20;
+      
+      doc.fontSize(10);
+      doc.text(`Center Line (X̄): ${chart.centerLine.toFixed(4)}`, 70, y);
+      doc.text(`Standard Deviation (σ): ${(chart.upperControlLimit - chart.centerLine) / 3).toFixed(4)}`, 300, y);
+      y += 15;
+      doc.text(`Upper Control Limit (UCL): ${chart.upperControlLimit.toFixed(4)}`, 70, y);
+      doc.text(`Lower Control Limit (LCL): ${chart.lowerControlLimit.toFixed(4)}`, 300, y);
+      y += 20;
+
+      // Sample size and data points
+      doc.text(`Sample Size: ${chart.dataPoints.length} observations`, 70, y);
+      doc.text(`Out of Control Points: ${chart.outOfControlPoints.length}`, 300, y);
+      y += 20;
+
+      // Process capability analysis
+      doc.fontSize(11).text('Process Capability Assessment:', 50, y);
+      y += 20;
+
+      const processCapability = this.calculateProcessCapability(chart);
+      doc.fontSize(10);
+      doc.text(`Cp (Process Potential): ${processCapability.cp.toFixed(3)}`, 70, y);
+      doc.text(`Cpk (Process Capability): ${processCapability.cpk.toFixed(3)}`, 300, y);
+      y += 15;
+
+      // Control chart interpretation
       if (chart.outOfControlPoints.length > 0) {
-        doc.text(`Process Status: OUT OF CONTROL`, 70, y);
-        doc.text(`Action Required: Investigate special causes`, 70, y + 15);
+        doc.fillColor('red').text(`◆ PROCESS STATUS: OUT OF CONTROL`, 70, y);
+        y += 15;
+        doc.fillColor('black').text(`Special Causes Detected at Points: ${chart.outOfControlPoints.join(', ')}`, 70, y);
+        y += 15;
+        doc.text(`Recommended Actions:`, 70, y);
+        y += 12;
+        doc.text(`• Investigate root causes for out-of-control points`, 90, y);
+        y += 12;
+        doc.text(`• Implement corrective actions`, 90, y);
+        y += 12;
+        doc.text(`• Monitor process more closely`, 90, y);
       } else {
-        doc.text(`Process Status: IN CONTROL`, 70, y);
-        doc.text(`Process appears stable`, 70, y + 15);
+        doc.fillColor('green').text(`◆ PROCESS STATUS: IN STATISTICAL CONTROL`, 70, y);
+        y += 15;
+        doc.fillColor('black').text(`Process is stable and predictable`, 70, y);
+        y += 15;
+        doc.text(`All data points fall within control limits`, 70, y);
       }
-      y += 40;
+      y += 25;
+
+      // Statistical analysis of control chart data
+      doc.fontSize(11).text('Statistical Summary:', 50, y);
+      y += 20;
+      
+      const stats = this.calculateControlChartStatistics(chart);
+      doc.fontSize(10);
+      doc.text(`Range (R): ${stats.range.toFixed(4)}`, 70, y);
+      doc.text(`Process Sigma: ${stats.processSigma.toFixed(4)}`, 200, y);
+      doc.text(`Control Limits Sigma: ${stats.controlLimitsSigma.toFixed(4)}`, 330, y);
+      y += 15;
+
+      // Control chart rules violations
+      const rulesViolations = this.checkControlChartRules(chart);
+      if (rulesViolations.length > 0) {
+        doc.fontSize(11).text('Control Chart Rules Violations:', 50, y);
+        y += 20;
+        doc.fontSize(10);
+        rulesViolations.forEach(violation => {
+          doc.text(`• ${violation}`, 70, y);
+          y += 15;
+        });
+      }
+
+      y += 20;
+      
+      // ASCII representation of control chart
+      doc.fontSize(11).text('Control Chart Visualization:', 50, y);
+      y += 20;
+      
+      const chartVisualization = this.generateASCIIControlChart(chart);
+      doc.fontSize(8).font('Courier');
+      chartVisualization.split('\n').forEach(line => {
+        if (y > 750) {
+          doc.addPage();
+          y = 50;
+        }
+        doc.text(line, 50, y);
+        y += 10;
+      });
+      doc.font('Helvetica');
+      
+      y += 30;
     });
+
+    // Overall process assessment
+    if (results.qualityControlCharts!.length > 0) {
+      if (y > 600) {
+        doc.addPage();
+        y = 50;
+      }
+      
+      doc.fontSize(14).text('Overall Process Assessment', 50, y);
+      y += 25;
+      
+      const overallAssessment = this.generateOverallProcessAssessment(results.qualityControlCharts!);
+      doc.fontSize(11).text(overallAssessment.summary, 50, y, { width: 500, align: 'justify' });
+      y += 40;
+      
+      doc.fontSize(12).text('Recommendations:', 50, y);
+      y += 20;
+      doc.fontSize(10);
+      overallAssessment.recommendations.forEach(rec => {
+        doc.text(`• ${rec}`, 70, y, { width: 450 });
+        y += 15;
+      });
+    }
   }
 
   private addTimeSeriesAnalysis(doc: PDFKit.PDFDocument, results: StatisticalResults) {
@@ -515,5 +662,141 @@ export class ReportGenerator {
       y += 15;
       doc.text(`BIC: ${ts.arima.bic.toFixed(3)}`, 70, y);
     }
+  }
+
+  private calculateProcessCapability(chart: any) {
+    const range = chart.upperControlLimit - chart.lowerControlLimit;
+    const sigma = range / 6; // 6 sigma range
+    const cp = range / (6 * sigma);
+    const cpk = Math.min(
+      (chart.upperControlLimit - chart.centerLine) / (3 * sigma),
+      (chart.centerLine - chart.lowerControlLimit) / (3 * sigma)
+    );
+    
+    return { cp, cpk };
+  }
+
+  private calculateControlChartStatistics(chart: any) {
+    const min = Math.min(...chart.dataPoints);
+    const max = Math.max(...chart.dataPoints);
+    const range = max - min;
+    const processSigma = (chart.upperControlLimit - chart.centerLine) / 3;
+    const controlLimitsSigma = 3; // 3-sigma control limits
+    
+    return { range, processSigma, controlLimitsSigma };
+  }
+
+  private checkControlChartRules(chart: any) {
+    const violations: string[] = [];
+    const data = chart.dataPoints;
+    const ucl = chart.upperControlLimit;
+    const lcl = chart.lowerControlLimit;
+    const cl = chart.centerLine;
+    
+    // Rule 1: Points beyond control limits
+    if (chart.outOfControlPoints.length > 0) {
+      violations.push(`Rule 1: ${chart.outOfControlPoints.length} points beyond control limits`);
+    }
+    
+    // Rule 2: 8 consecutive points on one side of center line
+    let consecutiveAbove = 0;
+    let consecutiveBelow = 0;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] > cl) {
+        consecutiveAbove++;
+        consecutiveBelow = 0;
+      } else {
+        consecutiveBelow++;
+        consecutiveAbove = 0;
+      }
+      
+      if (consecutiveAbove >= 8) {
+        violations.push('Rule 2: 8+ consecutive points above center line');
+        break;
+      }
+      if (consecutiveBelow >= 8) {
+        violations.push('Rule 2: 8+ consecutive points below center line');
+        break;
+      }
+    }
+    
+    return violations;
+  }
+
+  private generateASCIIControlChart(chart: any) {
+    const width = 60;
+    const height = 15;
+    const data = chart.dataPoints.slice(0, width); // Limit to chart width
+    
+    const min = Math.min(chart.lowerControlLimit, ...data);
+    const max = Math.max(chart.upperControlLimit, ...data);
+    
+    let chartLines: string[] = [];
+    
+    // Create chart grid
+    for (let row = 0; row < height; row++) {
+      let line = '';
+      const yValue = max - (row / (height - 1)) * (max - min);
+      
+      // Add y-axis label
+      if (row === 0) line += 'UCL |';
+      else if (row === Math.floor(height / 2)) line += ' CL |';
+      else if (row === height - 1) line += 'LCL |';
+      else line += '    |';
+      
+      // Plot data points
+      for (let col = 0; col < Math.min(width - 5, data.length); col++) {
+        const dataValue = data[col];
+        const plotRow = Math.round((max - dataValue) / (max - min) * (height - 1));
+        
+        if (plotRow === row) {
+          if (dataValue > chart.upperControlLimit || dataValue < chart.lowerControlLimit) {
+            line += 'X'; // Out of control
+          } else {
+            line += '*'; // In control
+          }
+        } else if (row === 0 && yValue >= chart.upperControlLimit) {
+          line += '-'; // UCL line
+        } else if (row === Math.floor(height / 2) && Math.abs(yValue - chart.centerLine) < (max - min) / (height * 2)) {
+          line += '-'; // Center line
+        } else if (row === height - 1 && yValue <= chart.lowerControlLimit) {
+          line += '-'; // LCL line
+        } else {
+          line += ' ';
+        }
+      }
+      
+      chartLines.push(line);
+    }
+    
+    // Add legend
+    chartLines.push('');
+    chartLines.push('Legend: * = In Control, X = Out of Control');
+    chartLines.push(`UCL = ${chart.upperControlLimit.toFixed(3)}, CL = ${chart.centerLine.toFixed(3)}, LCL = ${chart.lowerControlLimit.toFixed(3)}`);
+    
+    return chartLines.join('\n');
+  }
+
+  private generateOverallProcessAssessment(charts: any[]) {
+    const totalCharts = charts.length;
+    const outOfControlCharts = charts.filter(chart => chart.outOfControlPoints.length > 0).length;
+    const inControlCharts = totalCharts - outOfControlCharts;
+    
+    const summary = `Process assessment based on ${totalCharts} control chart(s): ${inControlCharts} process(es) are in statistical control, while ${outOfControlCharts} process(es) show signs of special cause variation. Overall process stability: ${outOfControlCharts === 0 ? 'STABLE' : outOfControlCharts < totalCharts / 2 ? 'MOSTLY STABLE' : 'UNSTABLE'}.`;
+    
+    const recommendations = [];
+    if (outOfControlCharts > 0) {
+      recommendations.push('Investigate and eliminate special causes in out-of-control processes');
+      recommendations.push('Implement corrective actions for identified issues');
+      recommendations.push('Increase sampling frequency for unstable processes');
+    }
+    if (inControlCharts > 0) {
+      recommendations.push('Continue monitoring stable processes with regular control charts');
+      recommendations.push('Consider process improvement initiatives for controlled processes');
+    }
+    recommendations.push('Review control limits periodically and update as needed');
+    recommendations.push('Train personnel on control chart interpretation and response procedures');
+    
+    return { summary, recommendations };
   }
 }
