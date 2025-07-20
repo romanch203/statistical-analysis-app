@@ -17,7 +17,6 @@ export default function Home() {
   
   const { data: analyses } = useQuery({
     queryKey: ["/api/analyses"],
-    refetchInterval: 2000, // Refresh every 2 seconds to get status updates
   });
 
   const handleFileUploaded = (analysisId: number) => {
@@ -201,7 +200,7 @@ export default function Home() {
                 <ChartLine className="text-2xl text-ibm-blue" />
                 <h3 className="text-xl font-semibold text-primary">StatAnalyzer Pro</h3>
               </div>
-              <p className="text-secondary mb-4">
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Advanced statistical analysis platform powered by IBM SPSS and R Studio with intelligent automation workflow.
                 Professional-grade statistical computing for researchers, analysts, and data scientists.
               </p>
