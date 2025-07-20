@@ -9,10 +9,10 @@ interface AnalysisProgressProps {
 }
 
 export default function AnalysisProgress({ analysisId }: AnalysisProgressProps) {
-  const { data: analysis, isLoading } = useQuery({
+  const { data: analysis, isLoading, refetch } = useQuery({
     queryKey: ["/api/analysis", analysisId],
     enabled: !!analysisId,
-    refetchInterval: 2000, // Poll every 2 seconds for updates
+    refetchInterval: analysis?.status === "processing" ? 3000 : false,
   });
 
   if (!analysisId || isLoading) {
@@ -32,7 +32,7 @@ export default function AnalysisProgress({ analysisId }: AnalysisProgressProps) 
 
   const getStepStatus = (step: number) => {
     if (!analysis) return "pending";
-    
+
     switch (step) {
       case 1: // File Upload
         return "completed";
@@ -112,7 +112,7 @@ export default function AnalysisProgress({ analysisId }: AnalysisProgressProps) 
         <Clock className="text-ibm-blue mr-2" />
         Analysis Pipeline
       </h3>
-      
+
       <div className="space-y-4">
         {steps.map((step) => (
           <div key={step.id} className={`flex items-center space-x-3 p-3 rounded-lg ${getStatusClass(step.status)}`}>

@@ -51,21 +51,31 @@ export default function ResultsPreview({ analysisId }: ResultsPreviewProps) {
         <div className="flex space-x-3">
           <Button 
             className="bg-success-green hover:bg-green-600"
-            asChild
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = `/api/analysis/${analysisId}/report?format=pdf`;
+              link.download = `analysis_report_${analysisId}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
           >
-            <a href={`/api/analysis/${analysisId}/report?format=pdf`} download>
-              <Download className="w-4 h-4 mr-2" />
-              Download PDF Report
-            </a>
+            <Download className="w-4 h-4 mr-2" />
+            Download PDF Report
           </Button>
           <Button 
             variant="outline"
-            asChild
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = `/api/analysis/${analysisId}/report?format=word`;
+              link.download = `analysis_report_${analysisId}.txt`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
           >
-            <a href={`/api/analysis/${analysisId}/report?format=word`} download>
-              <FileText className="w-4 h-4 mr-2" />
-              Download Word Report
-            </a>
+            <FileText className="w-4 h-4 mr-2" />
+            Download Word Report
           </Button>
         </div>
       </div>
@@ -154,13 +164,13 @@ export default function ResultsPreview({ analysisId }: ResultsPreviewProps) {
                     </td>
                     <td className="py-2 text-right text-secondary">{stats.count}</td>
                     <td className="py-2 text-right text-secondary">{stats.missing}</td>
-                    <td className="py-2 text-right text-secondary">
+                    <td className="py-2 text-right text-gray-700 dark:text-gray-300">
                       {stats.type === 'numerical' 
                         ? stats.mean?.toFixed(3) || 'N/A'
                         : stats.mode || 'N/A'
                       }
                     </td>
-                    <td className="py-2 text-right text-secondary">
+                    <td className="py-2 text-right text-gray-700 dark:text-gray-300">
                       {stats.type === 'numerical' 
                         ? stats.standardDeviation?.toFixed(3) || 'N/A'
                         : Object.keys(stats.frequencies || {}).length

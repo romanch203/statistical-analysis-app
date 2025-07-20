@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAnalysisSchema } from "@shared/schema";
 import multer from 'multer';
+import path from 'path';
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
@@ -98,18 +99,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       // Set appropriate headers and send file
-      const path = require('path');
       const filePath = path.join(process.cwd(), 'reports', reportFileName);
       
       if (format === 'pdf') {
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${reportFileName}"`);
+        res.setHeader('Content-Disposition', `attachment; filename="analysis_report_${id}.pdf"`);
       } else {
         res.setHeader('Content-Type', 'text/plain');
-        res.setHeader('Content-Disposition', `attachment; filename="${reportFileName}"`);
+        res.setHeader('Content-Disposition', `attachment; filename="analysis_report_${id}.txt"`);
       }
       
-      res.sendFile(filePath);
+      const fs = await import('fs');
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Report file not found" });
+      }
+      
+      res.sendFile(path.resolve(filePath));
     } catch (error: any) {
       console.error("Report generation error:", error);
       res.status(500).json({ message: error.message });

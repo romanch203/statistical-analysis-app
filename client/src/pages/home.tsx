@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function Home() {
   const [researchQuestion, setResearchQuestion] = useState("");
   const [currentAnalysisId, setCurrentAnalysisId] = useState<number | null>(null);
-  
+
   const { data: analyses } = useQuery({
     queryKey: ["/api/analyses"],
   });
@@ -58,7 +58,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Hero Section */}
         <Card className="p-8 mb-8">
           <div className="text-center mb-8">
@@ -68,7 +68,7 @@ export default function Home() {
               complete with AI-powered insights and publication-ready reports.
             </p>
           </div>
-          
+
           <FileUpload 
             researchQuestion={researchQuestion}
             onFileUploaded={handleFileUploaded}
@@ -83,7 +83,7 @@ export default function Home() {
                 <ServerCog className="text-ibm-blue mr-3" />
                 Analysis Configuration
               </h3>
-              
+
               <div className="space-y-6">
                 {/* Auto-Detection Status */}
                 <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
