@@ -80,10 +80,12 @@ export default function ResultsPreview({ analysisId }: ResultsPreviewProps) {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Data Summary</TabsTrigger>
           <TabsTrigger value="descriptive">Descriptive Statistics</TabsTrigger>
           <TabsTrigger value="tests">Statistical Tests</TabsTrigger>
+          <TabsTrigger value="advanced">Advanced Analysis</TabsTrigger>
+          <TabsTrigger value="regression">Regression</TabsTrigger>
           <TabsTrigger value="visualizations">Visualizations</TabsTrigger>
           <TabsTrigger value="interpretation">AI Interpretation</TabsTrigger>
         </TabsList>
@@ -225,11 +227,231 @@ export default function ResultsPreview({ analysisId }: ResultsPreviewProps) {
           )}
         </TabsContent>
 
+        <TabsContent value="advanced" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-lg font-medium text-primary mb-4">Normality Tests</h4>
+              {results.advancedTests?.normalityTests.map((test, index) => (
+                <Card key={index} className="p-4 mb-4">
+                  <h5 className="font-medium text-primary mb-2">{test.variable}</h5>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-secondary">Shapiro-Wilk:</span>
+                      <p className="font-medium">{test.shapiroWilk.toFixed(4)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">Jarque-Bera:</span>
+                      <p className="font-medium">{test.jarqueBera.toFixed(4)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">p-value:</span>
+                      <p className="font-medium">{test.pValue.toFixed(4)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">Distribution:</span>
+                      <Badge variant={test.pValue > 0.05 ? "default" : "destructive"}>
+                        {test.pValue > 0.05 ? "Normal" : "Non-Normal"}
+                      </Badge>
+                    </div>
+                  </div>
+                </Card>
+              )) || <p className="text-secondary">No normality tests performed</p>}
+            </div>
+
+            <div>
+              <h4 className="text-lg font-medium text-primary mb-4">Quality Control Charts</h4>
+              {results.qualityControlCharts?.map((chart, index) => (
+                <Card key={index} className="p-4 mb-4">
+                  <h5 className="font-medium text-primary mb-2">{chart.type.toUpperCase()} Chart</h5>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-secondary">Center Line:</span>
+                      <p className="font-medium">{chart.centerLine.toFixed(3)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">UCL:</span>
+                      <p className="font-medium">{chart.upperControlLimit.toFixed(3)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">LCL:</span>
+                      <p className="font-medium">{chart.lowerControlLimit.toFixed(3)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">Out of Control:</span>
+                      <Badge variant={chart.outOfControlPoints.length > 0 ? "destructive" : "default"}>
+                        {chart.outOfControlPoints.length} points
+                      </Badge>
+                    </div>
+                  </div>
+                </Card>
+              )) || <p className="text-secondary">No quality control charts generated</p>}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="regression" className="space-y-6">
+          {results.regressionAnalysis && results.regressionAnalysis.length > 0 ? (
+            <div className="space-y-4">
+              {results.regressionAnalysis.map((regression, index) => (
+                <Card key={index} className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h5 className="font-medium text-primary">{regression.type.toUpperCase()} Regression Model {index + 1}</h5>
+                    <Badge variant={regression.pValue <= 0.05 ? "default" : "secondary"}>
+                      {regression.pValue <= 0.05 ? "Significant" : "Not Significant"}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                    <div>
+                      <span className="text-secondary">R²:</span>
+                      <p className="font-medium">{regression.rSquared.toFixed(4)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">Adjusted R²:</span>
+                      <p className="font-medium">{regression.adjustedRSquared.toFixed(4)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">F-Statistic:</span>
+                      <p className="font-medium">{regression.fStatistic.toFixed(4)}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">p-value:</span>
+                      <p className="font-medium">{regression.pValue.toFixed(4)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <span className="text-secondary text-sm">Coefficients:</span>
+                    <div className="flex space-x-4 mt-1">
+                      <span className="text-sm">Intercept: {regression.coefficients[0]?.toFixed(4)}</span>
+                      <span className="text-sm">Slope: {regression.coefficients[1]?.toFixed(4)}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm">
+                    <span className="text-secondary">Model Equation:</span>
+                    <p className="font-mono mt-1">
+                      y = {regression.coefficients[0]?.toFixed(4)} + {regression.coefficients[1]?.toFixed(4)}x
+                    </p>
+                  </div>
+                </Card>
+              ))}
+              
+              {results.timeSeriesAnalysis && (
+                <Card className="p-4">
+                  <h5 className="font-medium text-primary mb-4">Time Series Analysis</h5>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="text-secondary">Trend:</span>
+                      <p className="font-medium capitalize">{results.timeSeriesAnalysis.trend}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary">Seasonality:</span>
+                      <Badge variant={results.timeSeriesAnalysis.seasonality ? "default" : "secondary"}>
+                        {results.timeSeriesAnalysis.seasonality ? "Detected" : "Not Detected"}
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="text-secondary">Autocorrelation:</span>
+                      <p className="font-medium">{results.timeSeriesAnalysis.autocorrelation[0]?.toFixed(3) || 'N/A'}</p>
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </div>
+          ) : (
+            <div className="text-center text-secondary py-8">
+              <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>No regression analysis performed</p>
+              <p className="text-sm mt-2">Need at least 2 numerical variables for regression analysis</p>
+            </div>
+          )}
+        </TabsContent>
+
         <TabsContent value="visualizations" className="space-y-6">
-          <div className="text-center text-secondary py-8">
-            <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Statistical visualizations will be included in the full report</p>
-            <p className="text-sm mt-2">Download the PDF report to view all charts and graphs</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-lg font-medium text-primary mb-4">Available Visualizations</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <BarChart3 className="w-4 h-4 text-ibm-blue" />
+                    <span className="text-sm">Histograms</span>
+                  </div>
+                  <Badge variant="outline">{results.visualizations?.histograms?.length || 0} charts</Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="w-4 h-4 text-success-green" />
+                    <span className="text-sm">Box Plots</span>
+                  </div>
+                  <Badge variant="outline">{results.visualizations?.boxplots?.length || 0} charts</Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Eye className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm">Scatter Plots</span>
+                  </div>
+                  <Badge variant="outline">{results.visualizations?.scatterplots?.length || 0} charts</Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <BarChart3 className="w-4 h-4 text-error-red" />
+                    <span className="text-sm">Q-Q Plots</span>
+                  </div>
+                  <Badge variant="outline">{results.visualizations?.qqPlots?.length || 0} charts</Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="w-4 h-4 text-ibm-blue" />
+                    <span className="text-sm">Control Charts</span>
+                  </div>
+                  <Badge variant="outline">{results.visualizations?.controlCharts?.length || 0} charts</Badge>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-medium text-primary mb-4">Data Quality Assessment</h4>
+              <div className="space-y-4">
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-secondary">Overall Data Quality</span>
+                    <Badge variant={
+                      results.dataOverview.dataQuality === 'excellent' ? 'default' :
+                      results.dataOverview.dataQuality === 'good' ? 'secondary' :
+                      results.dataOverview.dataQuality === 'fair' ? 'outline' : 'destructive'
+                    }>
+                      {results.dataOverview.dataQuality?.toUpperCase() || 'UNKNOWN'}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-secondary">
+                    Based on missing values, outliers, and distribution normality
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h5 className="text-sm font-medium text-primary mb-2">EDA Recommendations</h5>
+                  <ul className="text-xs text-secondary space-y-1">
+                    <li>• Check histogram distributions for skewness</li>
+                    <li>• Review box plots for outlier detection</li>
+                    <li>• Examine Q-Q plots for normality assessment</li>
+                    <li>• Use correlation heatmap for variable relationships</li>
+                    <li>• Monitor control charts for process stability</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center text-secondary py-4 border-t">
+            <BarChart3 className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">All visualization charts will be included in the full PDF report</p>
+            <p className="text-xs mt-1">Download the report to view interactive plots and detailed analysis</p>
           </div>
         </TabsContent>
 
