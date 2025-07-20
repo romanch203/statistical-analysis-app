@@ -12,7 +12,9 @@ export default function AnalysisProgress({ analysisId }: AnalysisProgressProps) 
   const { data: analysis, isLoading, refetch } = useQuery({
     queryKey: ["/api/analysis", analysisId],
     enabled: !!analysisId,
-    refetchInterval: analysis?.status === "processing" ? 3000 : false,
+    refetchInterval: (data) => {
+      return data?.status === "processing" ? 3000 : false;
+    },
   });
 
   if (!analysisId || isLoading) {
