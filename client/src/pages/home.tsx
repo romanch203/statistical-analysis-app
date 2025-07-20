@@ -34,7 +34,7 @@ export default function Home() {
                 <ChartLine className="text-2xl text-ibm-blue" />
                 <h1 className="text-xl font-semibold text-primary">StatAnalyzer Pro</h1>
               </div>
-              <div className="hidden md:flex items-center space-x-1 text-sm text-secondary">
+              <div className="hidden md:flex items-center space-x-1 text-sm text-gray-700 dark:text-gray-300">
                 <span>Powered by</span>
                 <span className="font-medium text-ibm-blue">IBM SPSS</span>
                 <span>&</span>
@@ -43,8 +43,8 @@ export default function Home() {
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
-              <a href="#features" className="text-secondary hover:text-ibm-blue transition-colors">Features</a>
-              <a href="#documentation" className="text-secondary hover:text-ibm-blue transition-colors">Documentation</a>
+              <a href="#features" className="text-gray-700 dark:text-gray-300 hover:text-ibm-blue transition-colors">Features</a>
+              <a href="#documentation" className="text-gray-700 dark:text-gray-300 hover:text-ibm-blue transition-colors">Documentation</a>
               <Button asChild className="bg-ibm-blue hover:bg-ibm-blue-dark">
                 <a href="https://chaudharyroman.com.np" target="_blank">
                   <Globe className="w-4 h-4 mr-2" />
@@ -91,7 +91,7 @@ export default function Home() {
                     <Brain className="text-ibm-blue" />
                     <div>
                       <h4 className="font-medium text-primary">Intelligent Auto-Detection Enabled</h4>
-                      <p className="text-sm text-secondary">System will automatically detect data types, variables, and optimal statistical tests</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">System will automatically detect data types, variables, and optimal statistical tests</p>
                     </div>
                   </div>
                 </div>
@@ -170,7 +170,7 @@ export default function Home() {
               <Bot className="text-xl text-ibm-blue" />
             </div>
             <h3 className="text-lg font-semibold text-primary mb-2">AI-Powered Analysis</h3>
-            <p className="text-secondary text-sm">Advanced algorithms automatically detect optimal statistical tests and provide intelligent interpretations of results.</p>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">Advanced algorithms automatically detect optimal statistical tests and provide intelligent interpretations of results.</p>
           </Card>
 
           <Card className="p-6 text-center">
@@ -178,7 +178,7 @@ export default function Home() {
               <FileText className="text-xl text-success-green" />
             </div>
             <h3 className="text-lg font-semibold text-primary mb-2">Professional Reports</h3>
-            <p className="text-secondary text-sm">Generate publication-ready reports with complete statistical analysis, visualizations, and methodology documentation.</p>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">Generate publication-ready reports with complete statistical analysis, visualizations, and methodology documentation.</p>
           </Card>
 
           <Card className="p-6 text-center">
@@ -186,7 +186,7 @@ export default function Home() {
               <Database className="text-xl text-purple-600" />
             </div>
             <h3 className="text-lg font-semibold text-primary mb-2">SPSS/R Compatible</h3>
-            <p className="text-secondary text-sm">Output identical to professional statistical software with the same accuracy and formatting standards.</p>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">Output identical to professional statistical software with the same accuracy and formatting standards.</p>
           </Card>
         </div>
       </main>
@@ -204,7 +204,7 @@ export default function Home() {
                 Advanced statistical analysis platform powered by IBM SPSS and R Studio with intelligent automation workflow.
                 Professional-grade statistical computing for researchers, analysts, and data scientists.
               </p>
-              <div className="text-sm text-secondary">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
                 <p className="mb-2">Powered by IBM SPSS and R Studio with Automation Workflow</p>
                 <p>© 2024 ROMAN CHAUDHARY. All rights reserved.</p>
               </div>
@@ -212,7 +212,7 @@ export default function Home() {
 
             <div>
               <h4 className="text-lg font-semibold text-primary mb-4">Support</h4>
-              <ul className="space-y-2 text-secondary">
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li><a href="#" className="hover:text-ibm-blue transition-colors">Documentation</a></li>
                 <li><a href="#" className="hover:text-ibm-blue transition-colors">API Reference</a></li>
                 <li><a href="#" className="hover:text-ibm-blue transition-colors">Tutorial Videos</a></li>
@@ -225,17 +225,17 @@ export default function Home() {
             <div>
               <h4 className="text-lg font-semibold text-primary mb-4">Contact Developer</h4>
               <div className="space-y-3">
-                <a href="https://chaudharyroman.com.np" target="_blank" className="flex items-center text-secondary hover:text-ibm-blue transition-colors">
+                <a href="https://chaudharyroman.com.np" target="_blank" className="flex items-center text-gray-700 dark:text-gray-300 hover:text-ibm-blue transition-colors">
                   <Globe className="mr-2 w-4 h-4" />
                   chaudharyroman.com.np
                 </a>
-                <a href="mailto:support@chaudharyroman.com.np" className="flex items-center text-secondary hover:text-ibm-blue transition-colors">
+                <a href="mailto:support@chaudharyroman.com.np" className="flex items-center text-gray-700 dark:text-gray-300 hover:text-ibm-blue transition-colors">
                   <Mail className="mr-2 w-4 h-4" />
                   Technical Support
                 </a>
                 <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-4">
                   <p className="text-sm text-ibm-blue font-medium">Need help with complex analysis?</p>
-                  <p className="text-xs text-secondary">Contact our developer for personalized statistical consulting.</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Contact our developer for personalized statistical consulting.</p>
                 </div>
               </div>
             </div>
