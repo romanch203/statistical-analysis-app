@@ -13,7 +13,6 @@ export default function ResultsPreview({ analysisId }: ResultsPreviewProps) {
   const { data: analysis, isLoading } = useQuery({
     queryKey: ["/api/analysis", analysisId],
     enabled: !!analysisId,
-    refetchInterval: 2000,
   });
 
   if (isLoading || !analysis) {
